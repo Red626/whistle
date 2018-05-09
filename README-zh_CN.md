@@ -30,13 +30,44 @@ whistle(读音`[ˈwɪsəl]`，拼音`[wēisǒu]`)是基于Node实现的跨平台
 
 ![动图演示](https://raw.githubusercontent.com/avwo/whistleui/master/assets/whistle.gif)
 
-## whistle 的获取和安装
-whistle的安装是非常简单的。在安装完node(推荐版本v6以上)之后，打开命令行运行 whistle start 或者简写方式 w2 start，即启动了whistle后台程序。[详细的安装指南](http://wproxy.org/whistle/install.html)
+## 安装和启动
+1. 安装Node：
 
-whistle采用了web界面，从而只需要一个浏览器就能随意访问，不会受到操作系统平台影响，甚至可以直接远程访问，相当的方便。在浏览器中输入: http://127.0.0.1:8899，就能看到whistle的界面了。如果有任何异常，请先参考[常见问题](http://wproxy.org/whistle/questions.html)。
+   [点击下载](https://nodejs.org/en/download/)(推荐v6版本以上)
+
+2. 安装whistle：
+
+   ```shell
+   npm i -g whistle
+   ```
+
+> Mac或Linux可能需要使用管理员权限：`sudo npm i -g whistle`
+
+3. 启动whistle：
+
+   ```shell
+   w2 start
+   ```
+
+> 安装完成后，可执行命令`w2 help`查看帮助信息。
+
+4. 配置代理：
+
+   配置代理到`127.0.0.1:8899`即可
+
+5. 安装证书：
+
+   安装根证书及开启https拦截后才可以正常操作或抓取https及websocket请求，具体参见：[安装根证书](https://avwo.github.io/whistle/webui/https.html)
+
+> 更多安装、代理配置相关内容请参考：[帮助文档](http://wproxy.org/whistle/install.html)
+
+6. 访问Web界面
+
+   whistle的使用采用了web界面，从而只需要一个浏览器就能随意访问，不会受到操作系统平台影响，甚至可以直接远程访问，相当的方便。在浏览器中输入: `http://127.0.0.1:8899`，就能看到whistle的界面了。如果有任何异常，请先参考[常见问题](http://wproxy.org/whistle/questions.html)。
+
 ![界面图片](./docs/assets/whistle-webui.png)
 
-## whistle 名词解释
+## 名词解释
 在使用whistle之前，有必要了解一下这几个名词概念：Rule， Value 和 Protocol
 
 **Rule**格式为：<目标规则> <响应操作1> ... <响应操作n> 
@@ -45,7 +76,7 @@ whistle采用了web界面，从而只需要一个浏览器就能随意访问，�
 
 **Value** 是一个非常便利的特色功能。可以认为是whistle本身提供的一个key-value数据库，通过在Rule中直接使用{key}引入实际的Value内容，而不需要提供本地文件路径。对于Value的管理，请看[这里](http://wproxy.org/whistle/webui/values.html)。
 
-##### 示例2
+##### 示例2（修改响应）
 
 1. 首先，在whistle界面中配置并启用一条**Rule**：```*/hello/whistle file://{helloword} resType://json``` 。其中，`*/hello/whistle` 为目标规则，`file:` 和 `resType:` 为Protocol。
 
@@ -59,7 +90,7 @@ whistle采用了web界面，从而只需要一个浏览器就能随意访问，�
 
 ![helloword Response](./docs/assets/whistle-helloword.png)
 
-## whistle 开始使用
+## 开始使用
 在顺利打开 http://127.0.0.1:8899 之后，看到的页面即whistle Web-UI，通过切换不同的菜单标签来实现日常操作。这里先简单介绍几个常用的标签：Network，Rules，Values，以及HTTPS。
 
 **Rules** 和 **Values** ，即分别为Rule和Value的管理界面。
@@ -70,7 +101,7 @@ whistle采用了web界面，从而只需要一个浏览器就能随意访问，�
 
 也许你会发现，对于**HTTPS**请求，浏览器会给出”不安全”的访问提示，这是因为还没有安装whistle的CA根证书，请参照[这里](http://wproxy.org/whistle/webui/https.html)，对应不同平台进行安装。安装成功之后，重启浏览器即可正常监听本地的https流量。
 
-##### 示例3
+##### 示例3（修改响应头部）
 
 1. 现在，我们对捕获的流量进行一些修改：
 
@@ -85,23 +116,112 @@ whistle采用了web界面，从而只需要一个浏览器就能随意访问，�
 ![规则命中](./docs/assets/whistle-reqHeaders-matched.png)
 ![规则生效](./docs/assets/whistle-reqHeaders-effective.png)
 
-## whistle 还能做什么
-从前面的几个例子可以看到，whistle 提供了方便的修改请求和响应的机制，这些在用法在与Fiddler或者Charles并没有太大差异。事实上，whistle提供的可不止这些。
+# 快速上手
+
+打开[Rules](http://local.whistlejs.com/)，通过右键菜单或页面上方菜单栏的 `Create` 按钮创建一个分组 `test`，按照下方的例子输入规则并保存：
+
+### 1. 设置hosts
+
+指定`www.ifeng.com`的ip:
+
+```
+www.ifeng.com 127.0.0.1
+# or
+127.0.0.1 www.ifeng.com
+```
+
+指定`www.ifeng.com`的ip和端口，把请求转发到本地8080端口（可用来去掉url中的端口号）:
+
+```
+# www.ifeng.com 127.0.0.1
+www.ifeng.com 127.0.0.1:8080
+# or
+127.0.0.1:8080 www.ifeng.com
+```
+
+也可以用某个域名的ip设置hosts
+
+```
+www.ifeng.com host://www.qq.com:8080
+# or
+host://www.qq.com:8080 www.ifeng.com
+```
+
+### 2. 本地替换
+
+平时开发中经常会用到这个功能，把响应替换成本地文件内容。
+
+```
+# Mac、Linux
+www.ifeng.com file:///User/username/test
+# or www.ifeng.com file:///User/username/test/index.html
+
+# Windows的路径分隔符可以用 \ 或者 /
+www.ifeng.com file://E:\xx\test
+# or www.ifeng.com file://E:\xx\test\index.html
+```
+
+`http://www.ifeng.com/`会先尝试加载`/User/username/test`这个文件，如果不存在，则会加载`/User/username/test/index.html`，如果没有对应的文件则返回404。
+
+`http://www.ifeng.com/xxx`会先尝试加载`/User/username/test/xxx`这个文件，如果不存在，则会加载`/User/username/test/xxx/index.html`，如果没有对应的文件则返回404。
+
+也可以替换jsonp请求，具体参见：[tpl](rules/rule/tpl.html)
+
+### 3. 请求转发	
+
+`www.ifeng.com`域名下的请求都替换成对应的`www.aliexpress.com`域名
+
+```
+www.ifeng.com www.aliexpress.com
+```
+
+### 4. 注入html、js、css
+
+whistle会自动根据响应内容的类型，判断是否注入相应的文本及如何注入(是否要用标签包裹起来)。
+
+```
+# Mac、Linux
+www.ifeng.com html:///User/xxx/test/test.html
+www.ifeng.com js:///User/xxx/test/test.js
+www.ifeng.com css:///User/xxx/test/test.css
+
+# Windows的路径分隔符可以用`\`和`/`
+www.ifeng.com html://E:\xx\test\test.html
+www.ifeng.com js://E:\xx\test\test.js
+www.ifeng.com css://E:\xx\test\test.css
+```
+
+所有www.ifeng.com域名下的请求，whistle都会根据响应类型，将处理好的文本注入到响应内容里面，如是html请求，js和css会分别自动加上`script`和`style`标签后追加到内容后面。
+
+### 5. 调试远程页面
+
+利用whistle提供的[weinre](rules/weinre.html)和[log](rules/log.html)两个协议，可以实现修改远程页面DOM结构及自动捕获页面js错误及console打印的信息，还可以在页面顶部或js文件底部注入指定的脚步调试页面信息。
+
+使用whistle的功能前，先把要相应的系统代理或浏览器代理指向whistle，如何设置可以参考：[安装启动](install.html)
+
+**weinre**：
+
+```
+www.ifeng.com weinre://test
+```
 
 
-whistle 还可以通过
+配置后保存，打开`[www.ifeng.com](http://www.ifeng.com/)`，鼠标放在菜单栏的weinre按钮上会显示一个列表，并点击其中的`test`项打开weinre的调试页面选择对应的url切换到Elements即可。
 
-  1. 参数替换[urlParams](http://wproxy.org/whistle/rules/urlParams.html)和模板[tpl](http://wproxy.org/whistle/rules/rule/tpl.html)更加灵活地修改请求和响应
+**log**:
 
-  2. 也内置[weiren](http://wproxy.org/whistle/rules/weinre.html)和[log](http://wproxy.org/whistle/rules/log.html)辅助web调试
+```
+www.ifeng.com log://{test.js}
+```
 
-  3. 支持[socks代理](http://wproxy.org/whistle/rules/socks.html)和[pac](http://wproxy.org/whistle/rules/pac.html)
+配置后保存，鼠标放在菜单栏的Values按钮上会显示一个列表，并点击其中的`test.js`项，whistle会自动在Values上建立一个test.js分组，在里面填入`console.log(1, 2, 3, {a: 123})`保存，打开Network -> 右侧Log -> Console，再打开`[www.ifeng.com](http://www.ifeng.com/)`，即可看到Log下面的Page输出的信息。
 
-  4. 甚至也提供了[websocket](http://wproxy.org/whistle/webui/websocket.html)的调试功能
+### 6. 还能做什么
 
-  5. 如果这些功能还无法满足你的需求，那可以考虑开发插件([Plugins](http://wproxy.org/whistle/webui/plugins.html))来实现更多自定义的功能。
+除了上述功能，whistle能做的事情还有很多，比如：使用[urlParams](http://wproxy.org/whistle/rules/urlParams.html)和[tpl](http://wproxy.org/whistle/rules/rule/tpl.html)更加灵活地修改请求和响应；支持[socks代理](http://wproxy.org/whistle/rules/socks.html)和[pac](http://wproxy.org/whistle/rules/pac.html)；提供[websocket](http://wproxy.org/whistle/webui/websocket.html)的调试功能。如果这些功能还无法满足你的需求，那可以考虑开发插件([Plugins](http://wproxy.org/whistle/webui/plugins.html))来实现更多自定义的功能。
 
-### 功能全景展示如下：
+### 功能全景如下：
 ![功能概览](https://raw.githubusercontent.com/avwo/whistleui/master/assets/whistle.png)
 
-
+# License
+[MIT](https://github.com/avwo/whistle/blob/master/LICENSE)
