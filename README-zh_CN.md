@@ -41,7 +41,7 @@ whistle(读音`[ˈwɪsəl]`，拼音`[wēisǒu]`)是基于Node实现的跨平台
    npm i -g whistle
    ```
 
-> Mac或Linux可能需要使用管理员权限：`sudo npm i -g whistle`
+   > Mac或Linux可能需要使用管理员权限：`sudo npm i -g whistle`
 
 3. 启动whistle：
 
@@ -49,7 +49,7 @@ whistle(读音`[ˈwɪsəl]`，拼音`[wēisǒu]`)是基于Node实现的跨平台
    w2 start
    ```
 
-> 安装完成后，可执行命令`w2 help`查看帮助信息。
+   > 安装完成后，可执行命令`w2 help`查看帮助信息。
 
 4. 配置代理：
 
@@ -59,7 +59,7 @@ whistle(读音`[ˈwɪsəl]`，拼音`[wēisǒu]`)是基于Node实现的跨平台
 
    安装根证书及开启https拦截后才可以正常操作或抓取https及websocket请求，具体参见：[安装根证书](https://avwo.github.io/whistle/webui/https.html)
 
-> 更多安装、代理配置相关内容请参考：[帮助文档](http://wproxy.org/whistle/install.html)
+   > 更多安装、代理配置相关内容请参考：[帮助文档](http://wproxy.org/whistle/install.html)
 
 6. 访问Web界面
 
@@ -68,7 +68,7 @@ whistle(读音`[ˈwɪsəl]`，拼音`[wēisǒu]`)是基于Node实现的跨平台
 ![界面图片](./docs/assets/whistle-webui.png)
 
 ## 名词解释
-在使用whistle之前，有必要了解一下这几个名词概念：Rule， Value 和 Protocol
+> 在使用whistle之前，有必要了解一下这几个名词概念：Rule， Value 和 Protocol
 
 **Rule**格式为：<目标规则> <响应操作1> ... <响应操作n> 
 
@@ -91,7 +91,7 @@ whistle(读音`[ˈwɪsəl]`，拼音`[wēisǒu]`)是基于Node实现的跨平台
 ![helloword Response](./docs/assets/whistle-helloword.png)
 
 ## 开始使用
-在顺利打开 http://127.0.0.1:8899 之后，看到的页面即whistle Web-UI，通过切换不同的菜单标签来实现日常操作。这里先简单介绍几个常用的标签：Network，Rules，Values，以及HTTPS。
+在顺利打开 http://127.0.0.1:8899 之后，看到的页面即whistle的Web界面，通过切换不同的菜单标签来实现日常操作。这里先简单介绍几个常用的标签：Network，Rules，Values，以及HTTPS。
 
 **Rules** 和 **Values** ，即分别为Rule和Value的管理界面。
 
