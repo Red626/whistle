@@ -26,7 +26,8 @@ whistle(读音`[ˈwɪsəl]`，拼音`[wēisǒu]`)是基于Node实现的跨平台
 6. 支持导出抓包数据为txt、saz文件格式，及导入txt、saz、har文件
 7. 支持通过插件扩展，每个插件对应一个Node模块
 
-动图演示：
+##### 示例1（动图演示）
+
 ![动图演示](https://raw.githubusercontent.com/avwo/whistleui/master/assets/whistle.gif)
 
 ## whistle 的获取和安装
@@ -44,7 +45,7 @@ whistle采用了web界面，从而只需要一个浏览器就能随意访问，�
 
 **Value** 是一个非常便利的特色功能。可以认为是whistle本身提供的一个key-value数据库，通过在Rule中直接使用{key}引入实际的Value内容，而不需要提供本地文件路径。对于Value的管理，请看[这里](http://wproxy.org/whistle/webui/values.html)。
 
-##### 示例1
+##### 示例2
 
 1. 首先，在whistle界面中配置并启用一条**Rule**：```*/hello/whistle file://{helloword} resType://json``` 。其中，`*/hello/whistle` 为目标规则，`file:` 和 `resType:` 为Protocol。
 
@@ -69,7 +70,7 @@ whistle采用了web界面，从而只需要一个浏览器就能随意访问，�
 
 也许你会发现，对于**HTTPS**请求，浏览器会给出”不安全”的访问提示，这是因为还没有安装whistle的CA根证书，请参照[这里](http://wproxy.org/whistle/webui/https.html)，对应不同平台进行安装。安装成功之后，重启浏览器即可正常监听本地的https流量。
 
-##### 示例2
+##### 示例3
 
 1. 现在，我们对捕获的流量进行一些修改：
 
