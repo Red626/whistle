@@ -53,13 +53,11 @@ whistle(读音`[ˈwɪsəl]`，拼音`[wēisǒu]`)是基于Node实现的跨平台
 
 4. 配置代理：
 
-   配置代理到`127.0.0.1:8899`即可
+   配置代理到`127.0.0.1:8899`即可，具体请参考：[帮助文档](http://wproxy.org/whistle/install.html)
 
 5. 安装证书：
 
    安装根证书及开启https拦截后才可以正常操作或抓取https及websocket请求，具体参见：[安装根证书](https://avwo.github.io/whistle/webui/https.html)
-
-   > 更多安装、代理配置相关内容请参考：[帮助文档](http://wproxy.org/whistle/install.html)
 
 6. 访问Web界面
 
