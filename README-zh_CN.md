@@ -26,7 +26,7 @@ whistle(读音`[ˈwɪsəl]`，拼音`[wēisǒu]`)是基于Node实现的跨平台
 6. 支持导出抓包数据为txt、saz文件格式，及导入txt、saz、har文件
 7. 支持通过插件扩展，每个插件对应一个Node模块
 
-##### 示例1（动图演示）
+##### 动图演示
 
 ![动图演示](https://raw.githubusercontent.com/avwo/whistleui/master/assets/whistle.gif)
 
@@ -74,152 +74,146 @@ whistle(读音`[ˈwɪsəl]`，拼音`[wēisǒu]`)是基于Node实现的跨平台
 
 **Value** 是一个非常便利的特色功能。可以认为是whistle本身提供的一个key-value数据库，通过在Rule中直接使用{key}引入实际的Value内容，而不需要提供本地文件路径。对于Value的管理，请看[这里](http://wproxy.org/whistle/webui/values.html)。
 
-##### 示例2（修改响应）
-
-1. 首先，在whistle界面中配置并启用一条**Rule**：```*/hello/whistle file://{helloword} resType://json``` 。其中，`*/hello/whistle` 为目标规则，`file:` 和 `resType:` 为Protocol。
-
-![helloword Rules](./docs/assets/whistle-rules-helloword.png)
-
-2. 其后分别指定了对应的操作内容，`{helloword}`为**Value**。
-
-![helloword Values](./docs/assets/whistle-values-helloword.png)
-
-3. 最终，该示例的效果就是，对于匹配成功的http请求，使用 Value {helloword}作为http响应，并修改http header的Content-Type字段为：application/json，最后直接返回给浏览器。我们会发现，http://wproxy.org/hello/whistle 是捏造的一个URL地址，但是通过whistle的Rule将该请求拦截并成功进行修改。
-
-![helloword Response](./docs/assets/whistle-helloword.png)
-
 ## 开始使用
-在顺利打开 http://127.0.0.1:8899 之后，看到的页面即whistle的Web界面，通过切换不同的菜单标签来实现日常操作。这里先简单介绍几个常用的标签：Network，Rules，Values，以及HTTPS。
+> 在顺利打开 http://127.0.0.1:8899 之后，看到的页面即whistle的Web界面，通过切换不同的菜单标签来实现日常操作。
+
+####认识常用标签
+
+这里先简单介绍几个常用的标签：Network，Rules，Values，以及HTTPS。
 
 **Rules** 和 **Values** ，即分别为Rule和Value的管理界面。
 
-**Network**则是经过whistle这个http代理的流量。一开始的时候，会发现Network面板下是一片空白。这是因为我们还没有对系统或者浏览器进行http代理的配置，配置其转发流量到whistle。具体的配置请看[这里](http://wproxy.org/whistle/install.html)。
-
-成功配置http代理之后，可以看到Network面板开始忙碌了起来，一条条请求在不断刷屏。这时我们可以通过Filter来减少界面上展示的内容。点击任意一个请求，都可以在右侧面板中看到详情，如请求内容，回包内容，请求连接耗时等。
+**Network**则是经过whistle代理的流量。成功[配置http代理](http://wproxy.org/whistle/install.html)之后，可以看到Network面板开始忙碌了起来，一条条请求在不断刷屏。这时我们可以通过Filter来减少界面上展示的内容。点击任意一个请求，都可以在右侧面板中看到详情，如请求内容、回包内容、请求连接耗时、console日志等。
 
 也许你会发现，对于**HTTPS**请求，浏览器会给出”不安全”的访问提示，这是因为还没有安装whistle的CA根证书，请参照[这里](http://wproxy.org/whistle/webui/https.html)，对应不同平台进行安装。安装成功之后，重启浏览器即可正常监听本地的https流量。
 
-##### 示例3（修改响应头部）
+> 接下来通过几个简单示例来了解whistle的一些主要功能。每个示例都是独立的，读者可以根据需要选择性阅读。
 
-1. 现在，我们对捕获的流量进行一些修改：
+#### 示例1：mock数据
 
-   在Rules面板，在Default分组添加一行：
-   ```www.ifeng.com reqHeaders://{x-reqHeaders}```
+1. 首先，在**Rules**面板修改Default分组内容为```*/hello/whistle file://{helloword} resType://json```，其中`*/hello/whistle` 为目标规则，`file:` 和 `resType:` 为Protocol，`{helloword}`为Value。
+
+   ![helloword Rules](./docs/assets/whistle-rules-helloword.png)
+
+2. 其后在Values面板中，新建一个key为helloword的Value：
+
+   ![helloword Values](./docs/assets/whistle-values-helloword.png)
+
+3. 最终，该示例的效果就是，对于匹配成功的http请求，使用 Value {helloword}作为http响应，并修改http header的Content-Type字段为：application/json，最后直接返回给浏览器。我们会发现，`http://wproxy.org/hello/whistle `是捏造的一个URL地址，但是通过whistle的Rule将该请求拦截并成功进行修改。
+
+![helloword Response](./docs/assets/whistle-helloword.png)
+
+#### 示例2：设置hosts
+
+1. 在**Rules**面板修改Default分组内容为：
+
+   ```
+   www.test.com 127.0.0.1:8080
+   ```
+
+2. 访问`www.test.com`，即可把相应的请求转发到本地8080端口:
+
+   > 更多host配置可参考[文档](http://wproxy.org/whistle/rules/host.html)
+
+#### 示例3：修改响应
+
+1. 在**Rules**面板修改Default分组内容为：
+
+   ```
+   github.com reqHeaders://{x-reqHeaders}
+   ```
 
    在Values面板中，新建一个key为x-reqHeaders的Value：
-   ```x-test1: value1```
 
-2. 然后在配置了whistle代理的浏览器中访问 www.ifeng.com，此时可以看到Network面板中，www.ifeng.com 的浏览记录字体被加粗显示，并且右侧的Overview面板可以看到其命中的是哪一个Rule，查看该请求，可以发现请求已经带上了我们自定义的header。当然，Values面板只是为我们提供一个方便的在线的内容管理，我们也可以将内容保存到本地文件，再进行映射（参考[这里](http://wproxy.org/whistle/rules/rule/file.html)）。
+   ```
+   x-test1: value1
+   ```
+
+2. 打开一个新的浏览器标签并访问 imweb.io，此时可以看到Network面板中，imweb.io 的浏览记录字体被加粗显示，在右侧的Overview面板中可以通过自定义header看到其命中的是哪一个Rule，也可以在Request面板中看到新添加的`x-test1`请求头。当然，Values面板只是为我们提供一个方便的在线的内容管理，我们也可以将内容保存到本地文件，再进行映射（参考[这里](http://wproxy.org/whistle/rules/rule/file.html)）。
 
 ![规则命中](./docs/assets/whistle-reqHeaders-matched.png)
 ![规则生效](./docs/assets/whistle-reqHeaders-effective.png)
 
-# 快速上手
+#### 示例4：本地替换
 
-打开[Rules](http://local.whistlejs.com/)，通过右键菜单或页面上方菜单栏的 `Create` 按钮创建一个分组 `test`，按照下方的例子输入规则并保存：
+1. 在**Rules**面板修改Default分组内容为：
 
-### 1. 设置hosts
+   ```
+   # Mac、Linux
+   github.com file:///User/username/test
 
-指定`www.ifeng.com`的ip:
+   # Windows的路径分隔符可以用 \ 或者 /
+   github.com file://E:\xx\test
+   ```
 
-```
-www.ifeng.com 127.0.0.1
-# or
-127.0.0.1 www.ifeng.com
-```
+2. 访问`http://imweb.io/`时whistle会先尝试加载`*/test`这个文件，如果不存在，则会默认加载`*test/index.html`，如果没有对应的文件则返回404。
 
-指定`www.ifeng.com`的ip和端口，把请求转发到本地8080端口（可用来去掉url中的端口号）:
+   > 也可以替换jsonp请求，具体参见：[tpl](rules/rule/tpl.html)
 
-```
-# www.ifeng.com 127.0.0.1
-www.ifeng.com 127.0.0.1:8080
-# or
-127.0.0.1:8080 www.ifeng.com
-```
+#### 示例5：请求转发
 
-也可以用某个域名的ip设置hosts
+1. 在**Rules**面板修改Default分组内容为：
 
 ```
-www.ifeng.com host://www.qq.com:8080
-# or
-host://www.qq.com:8080 www.ifeng.com
+github.com www.test.com
 ```
 
-### 2. 本地替换
+2. 访问imweb.io域名时，所有的请求都将被替换成对应的`www.test.com`域名
 
-平时开发中经常会用到这个功能，把响应替换成本地文件内容。
+#### 示例6：注入html、js、css
 
-```
-# Mac、Linux
-www.ifeng.com file:///User/username/test
-# or www.ifeng.com file:///User/username/test/index.html
+1. 在**Rules**面板修改Default分组内容为：
 
-# Windows的路径分隔符可以用 \ 或者 /
-www.ifeng.com file://E:\xx\test
-# or www.ifeng.com file://E:\xx\test\index.html
-```
+   ```
+   # Mac、Linux
+   github.com htmlAppend:///User/xxx/test/test.html jsAppend:///User/xxx/test/test.js cssAppend:///User/xxx/test/test.css
 
-`http://www.ifeng.com/`会先尝试加载`/User/username/test`这个文件，如果不存在，则会加载`/User/username/test/index.html`，如果没有对应的文件则返回404。
+   # Windows的路径分隔符可以用`\`和`/`
+   github.com htmlAppend://E:\xx\test\test.html ://E:\xx\test\test.js cssAppend://E:\xx\test\test.css
+   ```
 
-`http://www.ifeng.com/xxx`会先尝试加载`/User/username/test/xxx`这个文件，如果不存在，则会加载`/User/username/test/xxx/index.html`，如果没有对应的文件则返回404。
+2. 所有imweb.io域名下的请求，whistle都会根据响应类型，将处理好的文本注入到响应内容里面，具体追加规则如下：
 
-也可以替换jsonp请求，具体参见：[tpl](rules/rule/tpl.html)
+   |          | htmlAppend |      jsAppend      |     cssAppend     |
+   | -------- | :--------: | :----------------: | :---------------: |
+   | html请求 |  直接追加  | <script>包裹后追加 | <style>包裹后追加 |
+   | js请求   |     -      |      直接追加      |         -         |
+   | csss请求 |     -      |         -          |     直接追加      |
 
-### 3. 请求转发	
+   > whistle会自动根据响应内容的类型，判断是否注入相应的文本及如何注入(是否要用标签包裹起来)，详情参考[htmlAppend](http://wproxy.org/whistle/rules/htmlAppend.html)、[jsAppend](http://wproxy.org/whistle/rules/jsAppend.html)、[cssAppend](http://wproxy.org/whistle/rules/cssAppend.html)。
 
-`www.ifeng.com`域名下的请求都替换成对应的`www.aliexpress.com`域名
+#### 示例7：调试远程页面
 
-```
-www.ifeng.com www.aliexpress.com
-```
+> 利用whistle提供的[weinre](rules/weinre.html)和[log](rules/log.html)两个协议，可以实现修改远程页面DOM结构及自动捕获页面js错误及console打印的信息，还可以在页面顶部或js文件底部注入指定的脚步调试页面信息。
 
-### 4. 注入html、js、css
+##### weinre
 
-whistle会自动根据响应内容的类型，判断是否注入相应的文本及如何注入(是否要用标签包裹起来)。
+1. 在**Rules**面板修改Default分组内容为：
 
-```
-# Mac、Linux
-www.ifeng.com html:///User/xxx/test/test.html
-www.ifeng.com js:///User/xxx/test/test.js
-www.ifeng.com css:///User/xxx/test/test.css
+   ```
+   imweb.io weinre://test
+   ```
 
-# Windows的路径分隔符可以用`\`和`/`
-www.ifeng.com html://E:\xx\test\test.html
-www.ifeng.com js://E:\xx\test\test.js
-www.ifeng.com css://E:\xx\test\test.css
-```
+2. 配置后保存，打开`imweb.io`，鼠标放在菜单栏的weinre按钮上会显示一个列表，并点击其中的**test**项打开weinre的调试页面选择对应的url切换到Elements即可。
 
-所有www.ifeng.com域名下的请求，whistle都会根据响应类型，将处理好的文本注入到响应内容里面，如是html请求，js和css会分别自动加上`script`和`style`标签后追加到内容后面。
+   ![weinre](./docs/assets/weinre.png)
 
-### 5. 调试远程页面
+##### log
 
-利用whistle提供的[weinre](rules/weinre.html)和[log](rules/log.html)两个协议，可以实现修改远程页面DOM结构及自动捕获页面js错误及console打印的信息，还可以在页面顶部或js文件底部注入指定的脚步调试页面信息。
+1. 在**Rules**面板修改Default分组内容为：
 
-使用whistle的功能前，先把要相应的系统代理或浏览器代理指向whistle，如何设置可以参考：[安装启动](install.html)
+   ```
+   imweb.io log://{test.js}
+   ```
 
-**weinre**：
+2. 配置后保存，鼠标放在菜单栏的Values按钮上会显示一个列表，并点击其中的`test.js`项，whistle会自动在Values上建立一个test.js分组，在里面填入`console.log(1, 2, 3, {a: 123})`保存，打开Network -> 右侧Log -> Console，再打开[imweb.io](http://imweb.io/)，即可看到Log下面的Page输出的信息。
 
-```
-www.ifeng.com weinre://test
-```
+   ![log](./docs/assets/log.png)
 
-
-配置后保存，打开`[www.ifeng.com](http://www.ifeng.com/)`，鼠标放在菜单栏的weinre按钮上会显示一个列表，并点击其中的`test`项打开weinre的调试页面选择对应的url切换到Elements即可。
-
-**log**:
-
-```
-www.ifeng.com log://{test.js}
-```
-
-配置后保存，鼠标放在菜单栏的Values按钮上会显示一个列表，并点击其中的`test.js`项，whistle会自动在Values上建立一个test.js分组，在里面填入`console.log(1, 2, 3, {a: 123})`保存，打开Network -> 右侧Log -> Console，再打开`[www.ifeng.com](http://www.ifeng.com/)`，即可看到Log下面的Page输出的信息。
-
-### 6. 还能做什么
-
-除了上述功能，whistle能做的事情还有很多，比如：使用[urlParams](http://wproxy.org/whistle/rules/urlParams.html)和[tpl](http://wproxy.org/whistle/rules/rule/tpl.html)更加灵活地修改请求和响应；支持[socks代理](http://wproxy.org/whistle/rules/socks.html)和[pac](http://wproxy.org/whistle/rules/pac.html)；提供[websocket](http://wproxy.org/whistle/webui/websocket.html)的调试功能。如果这些功能还无法满足你的需求，那可以考虑开发插件([Plugins](http://wproxy.org/whistle/webui/plugins.html))来实现更多自定义的功能。
+> 除了上述功能，whistle能做的事情还有很多，比如：使用[urlParams](http://wproxy.org/whistle/rules/urlParams.html)和[tpl](http://wproxy.org/whistle/rules/rule/tpl.html)更加灵活地修改请求和响应；支持[socks代理](http://wproxy.org/whistle/rules/socks.html)和[pac](http://wproxy.org/whistle/rules/pac.html)；提供[websocket](http://wproxy.org/whistle/webui/websocket.html)的调试功能。如果这些功能还无法满足你的需求，那可以考虑开发插件([Plugins](http://wproxy.org/whistle/webui/plugins.html))来实现更多自定义的功能。
 
 ### 功能全景如下：
 ![功能概览](https://raw.githubusercontent.com/avwo/whistleui/master/assets/whistle.png)
 
 # License
-[MIT](https://github.com/avwo/whistle/blob/master/LICENSE)
+[MIT](https://imweb.io/avwo/whistle/blob/master/LICENSE)
