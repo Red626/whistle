@@ -26,7 +26,7 @@ whistle(读音`[ˈwɪsəl]`，拼音`[wēisǒu]`)是基于Node实现的跨平台
 6. 支持导出抓包数据为txt、saz文件格式，及导入txt、saz、har文件
 7. 支持通过插件扩展，每个插件对应一个Node模块
 
-##### 动图演示
+**动图演示**
 
 ![动图演示](https://raw.githubusercontent.com/avwo/whistleui/master/assets/whistle.gif)
 
