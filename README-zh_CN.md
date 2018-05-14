@@ -197,7 +197,7 @@ github.com www.test.com
    imweb.io weinre://test
    ```
 
-2. 配置后保存，打开`imweb.io`，鼠标放在菜单栏的weinre按钮上会显示一个列表，并点击其中的**test**项打开weinre的调试页面选择对应的url切换到Elements即可。
+2. 打开`imweb.io`，鼠标放在菜单栏的weinre按钮上会显示一个列表，并点击其中的**test**项打开weinre的调试页面选择对应的url切换到Elements即可。
 
    ![weinre](./docs/assets/weinre.png)
 
@@ -209,7 +209,7 @@ github.com www.test.com
    imweb.io log://{test.js}
    ```
 
-2. 配置后保存，鼠标放在菜单栏的Values按钮上会显示一个列表，并点击其中的`test.js`项，whistle会自动在Values上建立一个test.js分组，在里面填入`console.log(1, 2, 3, {a: 123})`保存，打开Network -> 右侧Log -> Console，再打开[imweb.io](http://imweb.io/)，即可看到Log下面的Page输出的信息。
+2. 鼠标放在菜单栏的Values按钮上会显示一个列表，并点击其中的`test.js`项，whistle会自动在Values上建立一个test.js分组，在里面填入`console.log(1, 2, 3, {a: 123})`保存，打开Network -> 右侧Log -> Console，再打开[imweb.io](http://imweb.io/)，即可看到Log下面的Page输出的信息。
 
    ![log](./docs/assets/log.png)
 
