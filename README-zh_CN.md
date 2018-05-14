@@ -74,10 +74,9 @@ whistle(读音`[ˈwɪsəl]`，拼音`[wēisǒu]`)是基于Node实现的跨平台
 
 **Value** 是一个非常便利的特色功能。可以认为是whistle本身提供的一个key-value数据库，通过在Rule中直接使用{key}引入实际的Value内容，而不需要提供本地文件路径。对于Value的管理，请看[这里](http://wproxy.org/whistle/webui/values.html)。
 
-## 开始使用
-> 在顺利打开 http://127.0.0.1:8899 之后，看到的页面即whistle的Web界面，通过切换不同的菜单标签来实现日常操作。
+## 常用标签
 
-####认识常用标签
+> 在顺利打开 http://127.0.0.1:8899 之后，看到的页面即whistle的Web界面，通过切换不同的菜单标签来实现日常操作。
 
 这里先简单介绍几个常用的标签：Network，Rules，Values，以及HTTPS。
 
@@ -86,6 +85,10 @@ whistle(读音`[ˈwɪsəl]`，拼音`[wēisǒu]`)是基于Node实现的跨平台
 **Network**则是经过whistle代理的流量。成功[配置http代理](http://wproxy.org/whistle/install.html)之后，可以看到Network面板开始忙碌了起来，一条条请求在不断刷屏。这时我们可以通过Filter来减少界面上展示的内容。点击任意一个请求，都可以在右侧面板中看到详情，如请求内容、回包内容、请求连接耗时、console日志等。
 
 也许你会发现，对于**HTTPS**请求，浏览器会给出”不安全”的访问提示，这是因为还没有安装whistle的CA根证书，请参照[这里](http://wproxy.org/whistle/webui/https.html)，对应不同平台进行安装。安装成功之后，重启浏览器即可正常监听本地的https流量。
+
+更多标签功能请参考[界面功能](http://wproxy.org/whistle/webui/)。
+
+## 开始使用
 
 > 接下来通过几个简单示例来了解whistle的一些主要功能。每个示例都是独立的，读者可以根据需要选择性阅读。
 
@@ -186,7 +189,7 @@ github.com www.test.com
 
 > 利用whistle提供的[weinre](rules/weinre.html)和[log](rules/log.html)两个协议，可以实现修改远程页面DOM结构及自动捕获页面js错误及console打印的信息，还可以在页面顶部或js文件底部注入指定的脚步调试页面信息。
 
-##### weinre
+**weinre**
 
 1. 在**Rules**面板修改Default分组内容为：
 
@@ -198,7 +201,7 @@ github.com www.test.com
 
    ![weinre](./docs/assets/weinre.png)
 
-##### log
+**log**
 
 1. 在**Rules**面板修改Default分组内容为：
 
