@@ -82,7 +82,7 @@ whistle(读音`[ˈwɪsəl]`，拼音`[wēisǒu]`)是基于Node实现的跨平台
 
 **Rules** 和 **Values** ，即分别为Rule和Value的管理界面。
 
-**Network**则是经过whistle代理的流量。成功[配置http代理](http://wproxy.org/whistle/install.html)之后，可以看到Network面板开始忙碌了起来，一条条请求在不断刷屏。这时我们可以通过Filter来减少界面上展示的内容。点击任意一个请求，都可以在右侧面板中看到详情，如请求内容、回包内容、请求连接耗时、console日志等。
+**Network**则是经过whistle代理的流量。成功[配置http代理](http://wproxy.org/whistle/install.html)之后，可以看到Network面板开始忙碌了起来，一条条请求在不断刷屏。这时我们可以通过Filter来减少界面上展示的内容，也可通过**Settings**来设置*filter*（详情参考[这里](http://wproxy.org/whistle/webui/settings.html)）。点击任意一个请求，都可以在右侧面板中看到详情，如请求内容、回包内容、请求连接耗时、console日志等，也可以通过*Composer*来捏造请求，通过*Replay*来多次重复某一请求。
 
 也许你会发现，对于**HTTPS**请求，浏览器会给出”不安全”的访问提示，这是因为还没有安装whistle的CA根证书，请参照[这里](http://wproxy.org/whistle/webui/https.html)，对应不同平台进行安装。安装成功之后，重启浏览器即可正常监听本地的https流量。
 
@@ -106,24 +106,24 @@ whistle(读音`[ˈwɪsəl]`，拼音`[wēisǒu]`)是基于Node实现的跨平台
 
 ![helloword Response](./docs/assets/whistle-helloword.png)
 
-#### 示例2：设置hosts
+#### 示例2：修改hosts并过滤请求
 
 1. 在**Rules**面板修改Default分组内容为：
 
    ```
-   www.test.com 127.0.0.1:8080
+   www.test.com 127.0.0.1:8080 filter:///aa/i filter://!bb
    ```
 
-2. 访问`www.test.com`，即可把相应的请求转发到本地8080端口:
+2. 访问`www.test.com`，即可把url中包含aa、不包含bb的请求转发到本地8080端口，其中[filter](http://wproxy.org/whistle/rules/filter.html)支持正则表达式和取非语法。
 
-   > 更多host配置可参考[文档](http://wproxy.org/whistle/rules/host.html)
+   > 更过host配置详情可参考[文档](http://wproxy.org/whistle/rules/host.html)
 
-#### 示例3：修改响应
+#### 示例3：修改请求头部
 
 1. 在**Rules**面板修改Default分组内容为：
 
    ```
-   github.com reqHeaders://{x-reqHeaders}
+   www.test.com reqHeaders://{x-reqHeaders}
    ```
 
    在Values面板中，新建一个key为x-reqHeaders的Value：
@@ -132,36 +132,50 @@ whistle(读音`[ˈwɪsəl]`，拼音`[wēisǒu]`)是基于Node实现的跨平台
    x-test1: value1
    ```
 
-2. 打开一个新的浏览器标签并访问 imweb.io，此时可以看到Network面板中，imweb.io 的浏览记录字体被加粗显示，在右侧的Overview面板中可以通过自定义header看到其命中的是哪一个Rule，也可以在Request面板中看到新添加的`x-test1`请求头。当然，Values面板只是为我们提供一个方便的在线的内容管理，我们也可以将内容保存到本地文件，再进行映射（参考[这里](http://wproxy.org/whistle/rules/rule/file.html)）。
+2. 打开一个新的浏览器标签并访问 www.test.com，此时可以看到Network面板中，www.test.com 的浏览记录字体被加粗显示，在右侧的Overview面板中可以通过自定义header看到其命中的是哪一个Rule，也可以在Request面板中看到新添加的`x-test1`请求头。当然，Values面板只是为我们提供一个方便的在线的内容管理，我们也可以将内容保存到本地文件，再进行映射（参考[这里](http://wproxy.org/whistle/rules/rule/file.html)）。
 
 ![规则命中](./docs/assets/whistle-reqHeaders-matched.png)
 ![规则生效](./docs/assets/whistle-reqHeaders-effective.png)
 
-#### 示例4：本地替换
+#### 示例4：本地文件替换
 
 1. 在**Rules**面板修改Default分组内容为：
 
    ```
    # Mac、Linux
-   github.com file:///User/username/test
+   www.test.com file:///User/username/test
 
    # Windows的路径分隔符可以用 \ 或者 /
-   github.com file://E:\xx\test
+   www.test.com file://E:\xx\test
    ```
 
-2. 访问`http://imweb.io/`时whistle会先尝试加载`*/test`这个文件，如果不存在，则会默认加载`*test/index.html`，如果没有对应的文件则返回404。
+2. 访问`http://www.test.com/`时whistle会先尝试加载`*/test`这个文件，如果不存在，则会默认加载`*test/index.html`，如果没有对应的文件则返回404。
 
    > 也可以替换jsonp请求，具体参见：[tpl](rules/rule/tpl.html)
 
-#### 示例5：请求转发
+#### 示例5：修改请求、响应数据
 
 1. 在**Rules**面板修改Default分组内容为：
 
-```
-github.com www.test.com
-```
+   ```
+   www.test.com/cgi-bin/get-data reqMerge://(a=1&b=2) resMerge://()
+   ```
 
-2. 访问imweb.io域名时，所有的请求都将被替换成对应的`www.test.com`域名
+   在Values面板中，新建一个key为`test.json`的Value：
+
+   ```json
+   {
+     "name": "avenwu",
+     "obj": {
+       "test": 1,
+       "new": 2 
+     }
+   }
+   ```
+
+2. 当访问GET请求 `https://www.test.com/cgi-bin/get-data?x=2&a=0`时，会被whistle替换成 `https://www.test.com/cgi-bin/get-data?x=2&a=1&b=2`，**reqMerge**详情可参考[这里](http://wproxy.org/whistle/rules/reqMerge.html)。
+
+3. 如果响应类型为 `application/json`，且返回内容为```{"name":"test","obj":{"test":"hehe"}}```，则经过whistle后在浏览器会收到```{"name": "avenwu","obj":{"test":"hehe","new":2}}```，**resMerge**详情可参考[这里](http://wproxy.org/whistle/rules/resMerge.html)。
 
 #### 示例6：注入html、js、css
 
@@ -169,13 +183,13 @@ github.com www.test.com
 
    ```
    # Mac、Linux
-   github.com htmlAppend:///User/xxx/test/test.html jsAppend:///User/xxx/test/test.js cssAppend:///User/xxx/test/test.css
+   www.test.com htmlAppend:///User/xxx/test/test.html jsAppend:///User/xxx/test/test.js cssAppend:///User/xxx/test/test.css
 
    # Windows的路径分隔符可以用`\`和`/`
-   github.com htmlAppend://E:\xx\test\test.html ://E:\xx\test\test.js cssAppend://E:\xx\test\test.css
+   www.test.com htmlAppend://E:\xx\test\test.html ://E:\xx\test\test.js cssAppend://E:\xx\test\test.css
    ```
 
-2. 所有imweb.io域名下的请求，whistle都会根据响应类型，将处理好的文本注入到响应内容里面，具体追加规则如下：
+2. 所有www.test.com域名下的请求，whistle都会根据响应类型，将处理好的文本注入到响应内容里面，具体追加规则如下：
 
    |          | htmlAppend |      jsAppend      |     cssAppend     |
    | -------- | :--------: | :----------------: | :---------------: |
@@ -187,7 +201,7 @@ github.com www.test.com
 
 #### 示例7：调试远程页面
 
-> 利用whistle提供的[weinre](rules/weinre.html)和[log](rules/log.html)两个协议，可以实现修改远程页面DOM结构及自动捕获页面js错误及console打印的信息，还可以在页面顶部或js文件底部注入指定的脚步调试页面信息。
+> 利用whistle提供的[weinre](rules/weinre.html)和[log](rules/log.html)两个协议，可以实现修改远程页面DOM结构及自动捕获页面js错误及console打印的信息，还可以在页面顶部或js文件底部注入指定的脚步调试页面信息。注意，无论是手机，还是PC，都需要将代理设置到whistle。
 
 **weinre**
 
@@ -197,7 +211,7 @@ github.com www.test.com
    imweb.io weinre://test
    ```
 
-2. 配置后保存，打开`imweb.io`，鼠标放在菜单栏的weinre按钮上会显示一个列表，并点击其中的**test**项打开weinre的调试页面选择对应的url切换到Elements即可。
+2. 配置后保存，打开`www.test.com`，鼠标放在菜单栏的weinre按钮上会显示一个列表，并点击其中的**test**项打开weinre的调试页面选择对应的url切换到Elements即可。
 
    ![weinre](./docs/assets/weinre.png)
 
@@ -209,7 +223,7 @@ github.com www.test.com
    imweb.io log://{test.js}
    ```
 
-2. 配置后保存，鼠标放在菜单栏的Values按钮上会显示一个列表，并点击其中的`test.js`项，whistle会自动在Values上建立一个test.js分组，在里面填入`console.log(1, 2, 3, {a: 123})`保存，打开Network -> 右侧Log -> Console，再打开[imweb.io](http://imweb.io/)，即可看到Log下面的Page输出的信息。
+2. 配置后保存，鼠标放在菜单栏的Values按钮上会显示一个列表，并点击其中的`test.js`项，whistle会自动在Values上建立一个test.js分组，在里面填入`console.log(1, 2, 3, {a: 123})`保存，打开Network -> 右侧Log -> Console，再打开[www.test.com](http://www.test.com/)，即可看到Log下面的Page输出的信息。
 
    ![log](./docs/assets/log.png)
 
@@ -219,4 +233,4 @@ github.com www.test.com
 ![功能概览](https://raw.githubusercontent.com/avwo/whistleui/master/assets/whistle.png)
 
 # License
-[MIT](https://imweb.io/avwo/whistle/blob/master/LICENSE)
+[MIT](https://www.test.com/avwo/whistle/blob/master/LICENSE)
