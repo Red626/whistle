@@ -107,7 +107,13 @@ var Overview = React.createClass({
           if (PROXY_PROTOCOLS.indexOf(name) !== -1) {
             return;
           }
-          var rule = rules[name === 'reqScript' ? 'rulesFile' : name];
+          var key = name;
+          if (name === 'reqScript') {
+            key = 'rulesFile';
+          } else if (name === 'reqMerge') {
+            key = 'params';
+          }
+          var rule = rules[key];
           if (rule && rule.list) {
             rulesModal[name] = rule.list.map(function(rule) {
               return rule.rawPattern + ' ' + rule.matcher;

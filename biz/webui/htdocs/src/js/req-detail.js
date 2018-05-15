@@ -2,6 +2,7 @@ require('./base-css.js');
 require('../css/req-detail.css');
 var React = require('react');
 
+var json2 = require('./components/json');
 var Divider = require('./divider');
 var Properties = require('./properties');
 var util = require('./util');
@@ -57,19 +58,23 @@ var ReqDetail = React.createClass({
       } else if (json = util.resolveJSON(body, decodeURIComponent)) {
         json = req.json = {
           json: json,
-          str: JSON.stringify(json, null, '    ')
+          str: (window._$hasBigNumberJson ? json2 : JSON).stringify(json, null, '    ')
         };
       }
       delete headers.Host;
       cookies = util.parseQueryString(headers.cookie, /;\s*/g, null, decodeURIComponent);
       var url = modal.url;
-      var index = modal.url.indexOf('?');
-      query = util.parseQueryString(index == -1 ? '' : url.substring(index + 1), null, null, decodeURIComponent);
+      var realUrl = modal.realUrl;
+      if (!realUrl || !/^(?:http|wss)s?:\/\//.test(realUrl)) {
+        realUrl = url;
+      }
+      var index = realUrl.indexOf('?');
+      query = util.parseQueryString(index == -1 ? '' : realUrl.substring(index + 1), null, null, decodeURIComponent);
       if (util.isUrlEncoded(req)) {
         form = util.parseQueryString(req.body, null, null, decodeURIComponent);
       }
 
-      raw = [req.method, req.method == 'CONNECT' ? headers.host : util.getPath(modal.url), 'HTTP/' + (req.httpVersion || '1.1')].join(' ')
+      raw = [req.method, req.method == 'CONNECT' ? headers.host : util.getPath(realUrl), 'HTTP/' + (req.httpVersion || '1.1')].join(' ')
           + '\r\n' + util.objectToString(headers, req.rawHeaderNames) + '\r\n\r\n' + body;
       if (modal.isHttps) {
         tips = { isHttps: true };

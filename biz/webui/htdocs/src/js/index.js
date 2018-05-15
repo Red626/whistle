@@ -25,6 +25,7 @@ var DEFAULT = 'Default';
 var MAX_PLUGINS_TABS = 7;
 var MAX_FILE_SIZE = 1024 * 1024 * 64;
 var MAX_OBJECT_SIZE = 1024 * 1024 * 6;
+var MAX_REPLAY_COUNT = 30;
 var OPTIONS_WITH_SELECTED = ['removeSelected', 'exportWhistleFile', 'exportSazFile'];
 var RULES_ACTIONS = [
   {
@@ -128,6 +129,7 @@ var Index = React.createClass({
     var rules = modal.rules;
     var values = modal.values;
     var state = {
+      replayCount: 1,
       allowMultipleChoice: modal.rules.allowMultipleChoice,
       syncWithSysHosts: modal.rules.syncWithSysHosts,
       networkMode: modal.server.networkMode,
@@ -679,8 +681,20 @@ var Index = React.createClass({
       return [curItem];
     };
 
-    events.on('replaySessions', function(e, curItem) {
-      self.replay(e, getFocusItemList(curItem));
+    events.on('replaySessions', function(e, curItem, shiftKey) {
+      var list = getFocusItemList(curItem);
+      var len = list && list.length;
+      if (shiftKey && len === 1) {
+        self.replayList = list;
+        self.refs.setReplayCount.show();
+        setTimeout(function() {
+          var input = ReactDOM.findDOMNode(self.refs.replayCount);
+          input.select();
+          input.focus();
+        }, 300);
+        return;
+      }
+      self.replay(e, list);
     });
 
     events.on('importSessions', self.importSessions);
@@ -1740,14 +1754,21 @@ var Index = React.createClass({
       });
     }
   },
-  replay: function(e, list) {
+  replayCountChange: function(e) {
+    var count = e.target.value.replace(/^\s*0*|[^\d]+/, '');
+    var replayCount = count.slice(0, 2);
+    if (replayCount > MAX_REPLAY_COUNT) {
+      replayCount = MAX_REPLAY_COUNT;
+    }
+    this.setState({ replayCount: replayCount });
+  },
+  replay: function(e, list, count) {
     var modal = this.state.network;
     list = Array.isArray(list) ? list : (modal && modal.getSelectedList());
     if (!list || !list.length) {
       return;
     }
-
-    list.forEach(function(item) {
+    var replayReq = function(item) {
       var req = item.req;
       if (util.canReplay(item)) {
         dataCenter.composer({
@@ -1757,7 +1778,18 @@ var Index = React.createClass({
           body: item.reqError ? '' : item.req.body
         });
       }
-    });
+    };
+    if (count > 1) {
+      count = Math.min(count, MAX_REPLAY_COUNT);
+      var reqItem = list[0];
+      if (util.canReplay(reqItem)) {
+        for(var i = 0; i < count; i++) {
+          replayReq(reqItem);
+        }
+      }
+    } else {
+      list.forEach(replayReq);
+    }
     this.autoRefresh && this.autoRefresh();
   },
   composer: function() {
@@ -2161,6 +2193,13 @@ var Index = React.createClass({
     this.exportSessions(this.state.exportFileType, name);
     $(ReactDOM.findDOMNode(this.refs.chooseFileType)).modal('hide');
   },
+  replayRepeat: function(e) {
+    if (e && e.type !== 'click' && e.keyCode !== 13) {
+      return;
+    }
+    this.refs.setReplayCount.hide();
+    this.replay('', this.replayList, this.state.replayCount);
+  },
   showAboutDialog: function(e) {
     if ($(e.target).closest('.w-menu-enable').length) {
       this.refs.aboutDialog.showAboutInfo();
@@ -2491,11 +2530,27 @@ var Index = React.createClass({
               <a type="button"
                 onKeyDown={this.exportBySave}
                 tabIndex="0" onMouseDown={this.preventBlur}
-                className="btn btn-primary" onClick={this.exportBySave}>Confirm</a>
+                className="btn btn-primary" onClick={this.exportBySave}>Export</a>
             </div>
           </div>
         </div>
       </div>
+      <Dialog ref="setReplayCount" wstyle="w-replay-count-dialog">
+        <div className="modal-body">
+          <label>
+            Count:
+            <input ref="replayCount"
+              onKeyDown={this.replayRepeat}
+              onChange={this.replayCountChange}
+              value={state.replayCount}
+              className="form-control" maxLength="2" />
+          </label>
+          <a type="button"
+            onKeyDown={this.replayRepeat}
+            tabIndex="0" onMouseDown={this.preventBlur}
+            className="btn btn-primary" onClick={this.replayRepeat}>Replay</a>
+        </div>
+      </Dialog>
       <div ref="showUpdateTipsDialog" className="modal fade w-show-update-tips-dialog">
         <div className="modal-dialog">
             <div className="modal-content">

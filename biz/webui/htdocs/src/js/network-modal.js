@@ -1,3 +1,5 @@
+var util = require('./util');
+
 var MAX_LENGTH = 560;
 var MAX_COUNT = 720;
 
@@ -26,8 +28,22 @@ proto.search = function(keyword) {
     this._type = RegExp.$1;
     this._keyword = RegExp.$2.trim();
   }
+  if (this._not = this._keyword[0] === '!') {
+    this._keyword = this._keyword.substring(1);
+  }
+  this._keywordRE = util.toRegExp(this._keyword);
   this.filter();
   return keyword;
+};
+
+proto.checkKeywork = function(str) {
+  if (!str) {
+    return false;
+  }
+  if (!this._keyword) {
+    return true;
+  }
+  return this._keywordRE ? this._keywordRE.test(str) : str.indexOf(this._keyword) !== -1;
 };
 
 proto.hasKeyword = function() {
@@ -38,16 +54,19 @@ proto.setSortColumns = function(columns) {
   this._columns = columns;
   this.filter();
 };
-
+proto.checkNot = function(flag) {
+  return this._not ? !flag : flag;
+};
 proto.filter = function(newList) {
-  var keyword = this._keyword;
-  var list = this.list;
+  var self = this;
+  var keyword = self._keyword;
+  var list = self.list;
   if (!keyword) {
     list.forEach(function(item) {
       item.hide = false;
     });
   } else {
-    switch(this._type) {
+    switch(self._type) {
     case 'c':
     case 'content':
     case 'b':
@@ -55,15 +74,14 @@ proto.filter = function(newList) {
       list.forEach(function(item) {
         var reqBody = item.req.body;
         var resBody = item.res.body;
-        item.hide = (!reqBody || reqBody.indexOf(keyword) == -1) &&
-                 (!resBody || resBody.indexOf(keyword) == -1);
+        item.hide = self.checkNot(!self.checkKeywork(reqBody) && !self.checkKeywork(resBody));
       });
       break;
     case 'headers':
     case 'h':
       list.forEach(function(item) {
-        item.hide = !inObject(item.req.headers, keyword)
-                && !inObject(item.res.headers, keyword);
+        item.hide = self.checkNot(!self.inObject(item.req.headers, keyword)
+                && !self.inObject(item.res.headers, keyword));
       });
       break;
     case 'type':
@@ -71,16 +89,13 @@ proto.filter = function(newList) {
       list.forEach(function(item) {
         var type = item.res.headers;
         type = type && type['content-type'];
-        item.hide = !(typeof type == 'string' && type.indexOf(keyword) != -1);
+        item.hide = self.checkNot(!(typeof type == 'string' && self.checkKeywork(type)));
       });
       break;
     case 'ip':
     case 'i':
       list.forEach(function(item) {
-        var ip = item.req.ip || '';
-        var host = item.res.ip || '';
-        item.hide = ip.indexOf(keyword) == -1
-                && host.indexOf(keyword) == -1;
+        item.hide = self.checkNot(!self.checkKeywork(item.req.ip) && !self.checkKeywork(item.res.ip));
       });
       break;
     case 'status':
@@ -88,29 +103,28 @@ proto.filter = function(newList) {
     case 'result':
     case 'r':
       list.forEach(function(item) {
-        item.hide = item.res.statusCode == null ? true :
-            (item.res.statusCode + '').indexOf(keyword) == -1;
+        item.hide = self.checkNot(item.res.statusCode == null || !self.checkKeywork(item.res.statusCode + ''));
       });
       break;
     case 'method':
     case 'm':
       keyword = keyword.toUpperCase();
       list.forEach(function(item) {
-        item.hide = (item.req.method || '').indexOf(keyword) == -1;
+        item.hide = self.checkNot(!self.checkKeywork(item.req.method));
       });
       break;
     default:
       keyword = keyword.toLowerCase();
       list.forEach(function(item) {
-        item.hide = item.url.toLowerCase().indexOf(keyword) == -1;
+        item.hide = self.checkNot(!self.checkKeywork(item.url.toLowerCase()));
       });
     }
   }
 
-  var columns = this._columns;
+  var columns = self._columns;
   if (columns && columns.length) {
     var len = columns.length;
-    this.list.sort(function(prev, next) {
+    self.list.sort(function(prev, next) {
       for (var i = 0; i < len; i++) {
         var column = columns[i];
         var prevVal = prev[column.name];
@@ -124,7 +138,7 @@ proto.filter = function(newList) {
       return prev.order > next.order ? 1 : -1;
     });
   } else if (!newList) {
-    this.list = this._list.slice(0, MAX_LENGTH);
+    self.list = self._list.slice(0, MAX_LENGTH);
   }
 
   return list;
@@ -167,20 +181,20 @@ function _compare(prev, next, name) {
   return -1;
 }
 
-function inObject(obj, keyword) {
+proto.inObject = function(obj) {
   for (var i in obj) {
-    if (i.indexOf(keyword) != -1) {
+    if (this.checkKeywork(i)) {
       return true;
     }
     var value = obj[i];
     if (typeof value == 'string'
-        && value.indexOf(keyword) != -1) {
+        && this.checkKeywork(value)) {
       return true;
     }
   }
 
   return false;
-}
+};
 
 proto.clear = function clear() {
   this._list.splice(0, this._list.length);
