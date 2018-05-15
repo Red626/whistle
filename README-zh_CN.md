@@ -19,14 +19,14 @@ whistle(读音`[ˈwɪsəl]`，拼音`[wēisǒu]`)是基于Node实现的跨平台
 它提供了如下基本功能：
 
 1. 完全跨平台，支持Windows、Mac、Linux、Unix的桌面及命令行系统
-2. 支持抓包改包调试HTTP、HTTPS、WebSocket及Socket请求
+2. 支持抓包、改包、调试HTTP、HTTPS、WebSocket及Socket请求
 3. 内置weinre，支持在PC上查看修改移动端网页的DOM结构
 4. 内置[Log](https://avwo.github.io/whistle/webui/log.html)，支持自动捕获页面JS异常及显示 `console.xxx` 的打印数据
-5. 操作简单，有丰富的界面操作功能，所有的调试操作均可在界面上通过配置类似hosts的方式实现（详情参考[`pattern operatorURI`](https://avwo.github.io/whistle/pattern.html)）
+5. 操作简单，有丰富的界面操作功能，所有的调试操作均可在界面上通过配置类似hosts的方式实现（详情参考[pattern operatorURI](https://avwo.github.io/whistle/pattern.html)）
 6. 支持导出抓包数据为txt、saz文件格式，及导入txt、saz、har文件
 7. 支持通过插件扩展，每个插件对应一个Node模块
 
-##### 动图演示
+**动图演示**
 
 ![动图演示](https://raw.githubusercontent.com/avwo/whistleui/master/assets/whistle.gif)
 
@@ -102,7 +102,7 @@ whistle(读音`[ˈwɪsəl]`，拼音`[wēisǒu]`)是基于Node实现的跨平台
 
    ![helloword Values](./docs/assets/whistle-values-helloword.png)
 
-3. 最终，该示例的效果就是，对于匹配成功的http请求，使用 Value {helloword}作为http响应，并修改http header的Content-Type字段为：application/json，最后直接返回给浏览器。我们会发现，`http://wproxy.org/hello/whistle `是捏造的一个URL地址，但是通过whistle的Rule将该请求拦截并成功进行修改。
+3. 最终，该示例的效果就是，对于匹配成功的http请求，使用*hellowold*这个**value**作为http响应，并修改http header的Content-Type字段为`application/json`，最后直接返回给浏览器。我们会发现，`http://wproxy.org/hello/whistle `是捏造的一个URL地址，但是通过whistle的Rule将该请求拦截并成功进行修改。
 
 ![helloword Response](./docs/assets/whistle-helloword.png)
 
@@ -126,7 +126,7 @@ whistle(读音`[ˈwɪsəl]`，拼音`[wēisǒu]`)是基于Node实现的跨平台
    www.test.com reqHeaders://{x-reqHeaders}
    ```
 
-   在Values面板中，新建一个key为x-reqHeaders的Value：
+   在**Values**面板中，新建一个key为x-reqHeaders的Value：
 
    ```
    x-test1: value1
@@ -161,7 +161,7 @@ whistle(读音`[ˈwɪsəl]`，拼音`[wēisǒu]`)是基于Node实现的跨平台
    www.test.com/cgi-bin/get-data reqMerge://(a=1&b=2) resMerge://()
    ```
 
-   在Values面板中，新建一个key为`test.json`的Value：
+   在**Values**面板中，新建一个key为`test.json`的Value：
 
    ```json
    {
@@ -233,4 +233,4 @@ whistle(读音`[ˈwɪsəl]`，拼音`[wēisǒu]`)是基于Node实现的跨平台
 ![功能概览](https://raw.githubusercontent.com/avwo/whistleui/master/assets/whistle.png)
 
 # License
-[MIT](https://www.test.com/avwo/whistle/blob/master/LICENSE)
+[MIT](https://github.com/avwo/whistle/blob/master/LICENSE)
